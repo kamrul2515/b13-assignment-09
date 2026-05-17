@@ -4,7 +4,7 @@ import { BriefcaseMedical } from 'lucide-react'; // Navbar e jeta use korecho sh
 
 const Footer = () => {
     return (
-        <footer className="bg-[#E9EBF4] py-12 px-6">
+        <footer className="bg-[#E9EBF4] py-12 px-6 mt-8">
             <div className="container mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                 
                 {/* Left Side: Logo and Copyright */}

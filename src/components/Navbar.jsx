@@ -1,17 +1,43 @@
+"use client"; // Hook bebohar koray eta client component hote hobe
+
 import Link from 'next/link';
 import React from 'react';
-import { BriefcaseMedical } from 'lucide-react'; // Logo icon er jonyo
+import { usePathname } from 'next/navigation'; // Active path check korar jonno
+import { BriefcaseMedical } from 'lucide-react';
 
 const Navbar = () => {
-    // Active link style logic (current path er upor vitti kore)
+    const pathname = usePathname(); // Bortoman URL path nibe
+
+    // Active ebong Normal style classes
     const activeLinkClass = "text-[#0055CC] font-semibold border-b-2 border-[#0055CC] pb-1";
-    const normalLinkClass = "text-gray-600 font-medium hover:text-[#0055CC] transition-all";
+    const normalLinkClass = "text-gray-600 font-medium hover:text-[#0055CC] transition-all duration-300";
 
     const navLinks = (
         <>
-            <li><Link href="/" className={activeLinkClass}>Home</Link></li>
-            <li><Link href="/appointments" className={normalLinkClass}>Appointments</Link></li>
-            <li><Link href="/dashboard" className={normalLinkClass}>Dashboard</Link></li>
+            <li>
+                <Link 
+                    href="/" 
+                    className={pathname === "/" ? activeLinkClass : normalLinkClass}
+                >
+                    Home
+                </Link>
+            </li>
+            <li>
+                <Link 
+                    href="/appointments" 
+                    className={pathname === "/appointments" ? activeLinkClass : normalLinkClass}
+                >
+                    Appointments
+                </Link>
+            </li>
+            <li>
+                <Link 
+                    href="/dashboard" 
+                    className={pathname === "/dashboard" ? activeLinkClass : normalLinkClass}
+                >
+                    Dashboard
+                </Link>
+            </li>
         </>
     );
 
@@ -41,19 +67,19 @@ const Navbar = () => {
                     <Link href="/login" className="text-[#0055CC] font-medium hover:underline">
                         Log in
                     </Link>
-                    <Link href="/signup" className="bg-[#0055CC] text-white px-6 py-2 rounded-full font-medium hover:bg-[#0044aa] transition-all">
+                    <Link href="/signup" className="bg-[#0055CC] text-white px-6 py-2 rounded-full font-medium hover:bg-[#0044aa] transition-all shadow-md active:scale-95">
                         Sign Up
                     </Link>
                 </div>
 
-                {/* Mobile Menu (Optional but kept for functionality) */}
+                {/* Mobile Menu */}
                 <div className="md:hidden dropdown dropdown-end ml-4">
                     <label tabIndex={0} className="btn btn-ghost btn-circle">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </label>
-                    <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 gap-2">
+                    <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-lg bg-base-100 rounded-box w-52 gap-2">
                         {navLinks}
                     </ul>
                 </div>
