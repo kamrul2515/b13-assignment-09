@@ -5,7 +5,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'i.ibb.co' },
       { protocol: 'https', hostname: 'plus.unsplash.com' },
-      { protocol: 'https', hostname: 'www.freecodecamp.org' }, // যদি এখান থেকে ছবি নাও
+      { protocol: 'https', hostname: 'www.freecodecamp.org' },
     ],
   },
 };
