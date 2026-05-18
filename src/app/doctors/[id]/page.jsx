@@ -14,11 +14,10 @@ const DoctorDetails = ({ params }) => {
   useEffect(() => {
     const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-    fetch(`${API_BASE}/doctors`)
+    fetch(`${API_BASE}/doctors/${id}`)
       .then(res => res.json())
-      .then(allDoctors => {
-        const found = allDoctors.find(d => String(d._id) === String(id));
-        setDoctor(found);
+      .then(Data => {
+        setDoctor(Data);
         setLoading(false);
       })
       .catch((err) => {
