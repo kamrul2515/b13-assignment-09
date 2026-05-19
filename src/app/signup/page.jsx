@@ -1,187 +1,372 @@
 "use client";
-import React, { useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
-import { CheckCircle2, XCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
-import { authClient } from "@/lib/auth-client"; 
+
+import React, { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+
+import {
+  CheckCircle2,
+  XCircle,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  User,
+  Mail,
+  Lock,
+  ImageIcon,
+} from "lucide-react";
+
+import { authClient } from "@/lib/auth-client";
 
 const SignUp = () => {
   const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
+
   const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    photoUrl: '',
-    password: ''
+    fullName: "",
+    email: "",
+    photoUrl: "",
+    password: "",
   });
 
+  // PASSWORD VALIDATION
   const hasMinLength = formData.password.length >= 6;
   const hasUpperCase = /[A-Z]/.test(formData.password);
   const hasLowerCase = /[a-z]/.test(formData.password);
 
+  // HANDLE INPUT CHANGE
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // HANDLE SUBMIT
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // VALIDATION
     if (!hasMinLength || !hasUpperCase || !hasLowerCase) {
       toast.error("Please fulfill password requirements");
       return;
     }
 
-    await authClient.signUp.email({
-      email: formData.email,
-      password: formData.password,
-      name: formData.fullName,
-      image: formData.photoUrl,
-    }, {
-      onRequest: () => setLoading(true),
-      onResponse: () => setLoading(false),
-      onError: (ctx) => {
-        toast.error(ctx.error.message || "Something went wrong!");
-      },
-      onSuccess: () => {
-        toast.success("Account created successfully!");
-        router.push('/login');
-      }
-    });
+    try {
+      setLoading(true);
+
+      const userData = {
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+
+        // DEFAULT IMAGE
+        image:
+          formData.photoUrl ||
+          "https://i.ibb.co/4pDNDk1/avatar.png",
+      };
+
+      // DEBUG CONSOLE
+      console.log("Sending Signup Data =>", userData);
+
+      const response = await authClient.signUp.email(userData);
+
+      console.log("Signup Success =>", response);
+
+      toast.success("Account created successfully!");
+
+      // CLEAR FORM
+      setFormData({
+        fullName: "",
+        email: "",
+        photoUrl: "",
+        password: "",
+      });
+
+      router.push("/");
+    } catch (error) {
+      console.error("Signup Error =>", error);
+
+      toast.error(
+        error?.message ||
+          error?.error?.message ||
+          "Signup failed!"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
-      <div className="bg-white rounded-[40px] shadow-2xl overflow-hidden max-w-5xl w-full flex flex-col md:flex-row min-h-175">
-        
-        {/* Left Side: Brand Background */}
-        <div className="md:w-1/2 bg-[#0042A5] relative p-12 text-white hidden md:flex flex-col justify-between overflow-hidden">
-          <Image 
+    <div className="min-h-screen bg-[#F4F7FB] flex items-center justify-center p-4">
+
+      <div className="w-full max-w-6xl bg-white rounded-[40px] overflow-hidden shadow-2xl grid md:grid-cols-2">
+
+        {/* LEFT SIDE */}
+        <div className="hidden md:flex relative bg-[#0055CC] p-12 flex-col justify-between overflow-hidden">
+
+          <Image
             src="https://images.unsplash.com/photo-1666214276372-24e331683e78?q=80&w=1974&auto=format&fit=crop"
-            alt="Healthcare background"
+            alt="Healthcare"
             fill
-            className="object-cover opacity-40" 
             priority
+            className="object-cover opacity-20"
           />
-          
+
           <div className="relative z-10">
-            <h2 className="text-4xl font-bold tracking-tight uppercase">Register</h2>
-            <div className="w-12 h-1.5 bg-blue-400 mt-4 rounded-full"></div>
+            <h2 className="text-5xl font-black text-white leading-tight">
+              Join Our
+              <br />
+              Healthcare
+              <br />
+              Platform
+            </h2>
+
+            <div className="w-24 h-2 bg-blue-300 rounded-full mt-6"></div>
           </div>
 
-          <div className="relative z-10 bg-white/10 backdrop-blur-xl p-8 rounded-4xl border border-white/20">
-            <h3 className="text-2xl font-bold mb-3">Join Our Network</h3>
-            <p className="text-blue-50 leading-relaxed mb-6 text-sm">
-              Connect with top-tier healthcare professionals and manage your health journey.
+          <div className="relative z-10 bg-white/10 backdrop-blur-lg border border-white/20 p-8 rounded-3xl">
+
+            <h3 className="text-2xl font-bold text-white mb-4">
+              Trusted by Thousands
+            </h3>
+
+            <p className="text-blue-100 leading-relaxed text-sm mb-6">
+              Connect with experienced doctors and manage
+              appointments easily from anywhere.
             </p>
+
             <div className="flex items-center gap-3">
-                <div className="flex -space-x-3">
-                    {[1,2,3].map(i => (
-                        <div key={i} className="w-10 h-10 rounded-full border-2 border-[#0042A5] bg-gray-300 relative overflow-hidden">
-                            <Image 
-                              src={`https://i.pravatar.cc/150?u=${i}`} 
-                              alt="avatar" 
-                              width={40} 
-                              height={40} 
-                              className="object-cover" 
-                            />
-                        </div>
-                    ))}
-                </div>
-                <p className="text-sm font-medium text-blue-200">Trusted by 5,000+ Doctors</p>
+              <div className="flex -space-x-3">
+                {[1, 2, 3].map((i) => (
+                  <Image
+                    key={i}
+                    src={`https://i.pravatar.cc/100?img=${i}`}
+                    alt="avatar"
+                    width={45}
+                    height={45}
+                    className="rounded-full border-2 border-white"
+                  />
+                ))}
+              </div>
+
+              <p className="text-sm font-semibold text-blue-100">
+                5000+ Active Users
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Right Side: Form */}
-        <div className="md:w-1/2 p-8 md:p-14 flex flex-col justify-center bg-white">
-          <header className="mb-8 text-center md:text-left">
-            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Create Account</h1>
-            <p className="text-gray-500 mt-2">Start your healthcare journey today.</p>
-          </header>
+        {/* RIGHT SIDE */}
+        <div className="p-8 md:p-14 flex flex-col justify-center">
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* HEADER */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-black text-gray-900">
+              Create Account
+            </h1>
+
+            <p className="text-gray-500 mt-2">
+              Start your healthcare journey today.
+            </p>
+          </div>
+
+          {/* FORM */}
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-5"
+          >
+
+            {/* FULL NAME */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">Full Name</label>
-              <input
-                type="text"
-                placeholder="Dr. Jane Smith"
-                className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 ring-blue-100 outline-none transition-all"
-                value={formData.fullName}
-                onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                required
-              />
-            </div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Full Name
+              </label>
 
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">Email Address</label>
-              <input
-                type="email"
-                placeholder="jane.smith@healthcare.com"
-                className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 ring-blue-100 outline-none transition-all"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                required
-              />
-            </div>
-
-            <div className="pb-2">
-              <label className="block text-sm font-bold text-gray-700 mb-1.5 ml-1">Password</label>
               <div className="relative">
+                <User
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="John Doe"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#0055CC] focus:bg-white transition"
+                />
+              </div>
+            </div>
+
+            {/* EMAIL */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Email Address
+              </label>
+
+              <div className="relative">
+                <Mail
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="example@gmail.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#0055CC] focus:bg-white transition"
+                />
+              </div>
+            </div>
+
+            {/* IMAGE URL */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Photo URL
+              </label>
+
+              <div className="relative">
+                <ImageIcon
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+
+                <input
+                  type="text"
+                  name="photoUrl"
+                  placeholder="https://example.com/photo.jpg"
+                  value={formData.photoUrl}
+                  onChange={handleChange}
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#0055CC] focus:bg-white transition"
+                />
+              </div>
+            </div>
+
+            {/* PASSWORD */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
+                Password
+              </label>
+
+              <div className="relative">
+                <Lock
+                  size={18}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+
                 <input
                   type={showPassword ? "text" : "password"}
+                  name="password"
                   placeholder="••••••••"
-                  className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 ring-blue-100 outline-none transition-all"
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  onChange={handleChange}
                   required
+                  className="w-full pl-12 pr-14 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-[#0055CC] focus:bg-white transition"
                 />
+
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  onClick={() =>
+                    setShowPassword(!showPassword)
+                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {showPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
                 </button>
               </div>
-              
-              <div className="mt-4 space-y-2 ml-1">
-                <ValidationItem label="At least 6 characters" isValid={hasMinLength} />
-                <ValidationItem label="One uppercase letter" isValid={hasUpperCase} />
-                <ValidationItem label="One lowercase letter" isValid={hasLowerCase} />
+
+              {/* PASSWORD REQUIREMENTS */}
+              <div className="mt-4 space-y-2">
+
+                <ValidationItem
+                  label="At least 6 characters"
+                  isValid={hasMinLength}
+                />
+
+                <ValidationItem
+                  label="One uppercase letter"
+                  isValid={hasUpperCase}
+                />
+
+                <ValidationItem
+                  label="One lowercase letter"
+                  isValid={hasLowerCase}
+                />
               </div>
             </div>
 
+            {/* BUTTON */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#0055CC] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-all disabled:bg-gray-400"
+              className="w-full bg-[#0055CC] hover:bg-blue-700 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition disabled:opacity-70"
             >
-              {loading ? "Registering..." : "Register Account"} <ArrowRight size={20} />
+              {loading ? "Registering..." : "Create Account"}
+
+              <ArrowRight size={20} />
             </button>
           </form>
 
-          <div className="mt-8">
-            <div className="relative flex items-center justify-center mb-6">
-                <div className="border-t border-gray-100 w-full"></div>
-                <span className="absolute bg-white px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Or sign up with</span>
-            </div>
+          {/* DIVIDER */}
+          <div className="relative my-8">
 
-            <button 
-              type="button"
-              onClick={() => authClient.signIn.social({ provider: "google" })}
-              className="w-full py-3.5 border border-gray-200 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-gray-50 transition-all text-gray-700"
-            >
-              <Image 
-                src="https://www.svgrepo.com/show/475656/google-color.svg" 
-                alt="google" 
-                width={20} 
-                height={20} 
-              />
-              Google
-            </button>
+            <div className="border-t border-gray-200"></div>
+
+            <span className="absolute left-1/2 -translate-x-1/2 -top-3 bg-white px-4 text-xs font-bold text-gray-400 uppercase">
+              Or Continue With
+            </span>
           </div>
 
+          {/* GOOGLE */}
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                await authClient.signIn.social({
+                  provider: "google",
+                });
+              } catch (error) {
+                console.log(error);
+                toast.error("Google Sign In Failed");
+              }
+            }}
+            className="w-full py-4 border border-gray-200 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-gray-50 transition"
+          >
+            <Image
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="google"
+              width={22}
+              height={22}
+            />
+
+            Continue with Google
+          </button>
+
+          {/* LOGIN */}
           <p className="text-center mt-8 text-gray-500 font-medium">
-            Already have an account? <Link href="/login" className="text-[#0055CC] font-bold hover:underline">Log in</Link>
+            Already have an account?
+
+            <Link
+              href="/login"
+              className="text-[#0055CC] font-bold ml-2 hover:underline"
+            >
+              Login
+            </Link>
           </p>
         </div>
       </div>
@@ -189,9 +374,20 @@ const SignUp = () => {
   );
 };
 
+// VALIDATION COMPONENT
 const ValidationItem = ({ label, isValid }) => (
-  <div className={`flex items-center gap-2 text-xs font-bold uppercase ${isValid ? 'text-green-600' : 'text-gray-400'}`}>
-    {isValid ? <CheckCircle2 size={14} /> : <XCircle size={14} className="text-red-400" />} {label}
+  <div
+    className={`flex items-center gap-2 text-sm font-medium ${
+      isValid ? "text-green-600" : "text-gray-400"
+    }`}
+  >
+    {isValid ? (
+      <CheckCircle2 size={16} />
+    ) : (
+      <XCircle size={16} className="text-red-400" />
+    )}
+
+    {label}
   </div>
 );
 
