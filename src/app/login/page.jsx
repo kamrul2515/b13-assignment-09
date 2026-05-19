@@ -80,12 +80,13 @@ const Login = () => {
 
       toast.success("Login successful!");
 
-      localStorage.setItem(
-        "userEmail",
-        formData.email
-      );
+localStorage.setItem(
+  "userEmail",
+  formData.email
+);
 
-      router.push("/");
+router.push("/");
+router.refresh();
     } catch (err) {
       console.log("Catch Error =>", err);
 

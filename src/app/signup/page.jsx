@@ -49,58 +49,70 @@ const SignUp = () => {
 
   // HANDLE SUBMIT
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // VALIDATION
-    if (!hasMinLength || !hasUpperCase || !hasLowerCase) {
-      toast.error("Please fulfill password requirements");
-      return;
-    }
+  // PASSWORD VALIDATION
+  if (!hasMinLength || !hasUpperCase || !hasLowerCase) {
+    toast.error("Please fulfill password requirements");
+    return;
+  }
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const userData = {
-        name: formData.fullName,
-        email: formData.email,
-        password: formData.password,
+    const userData = {
+      name: formData.fullName,
+      email: formData.email,
+      password: formData.password,
 
-        // DEFAULT IMAGE
-        image:
-          formData.photoUrl ||
-          "https://i.ibb.co/4pDNDk1/avatar.png",
-      };
+      image:
+        formData.photoUrl ||
+        "https://i.ibb.co/4pDNDk1/avatar.png",
+    };
 
-      // DEBUG CONSOLE
-      console.log("Sending Signup Data =>", userData);
+    // SIGNUP
+    const response = await authClient.signUp.email(userData);
 
-      const response = await authClient.signUp.email(userData);
+    console.log("Signup Success =>", response);
 
-      console.log("Signup Success =>", response);
+    // IMPORTANT FIX
+    // signup korar sathe sathe email save hobe
+    localStorage.setItem(
+      "userEmail",
+      formData.email
+    );
 
-      toast.success("Account created successfully!");
+    // AUTO LOGIN
+    await authClient.signIn.email({
+      email: formData.email,
+      password: formData.password,
+    });
 
-      // CLEAR FORM
-      setFormData({
-        fullName: "",
-        email: "",
-        photoUrl: "",
-        password: "",
-      });
+    toast.success("Account created successfully!");
 
-      router.push("/");
-    } catch (error) {
-      console.error("Signup Error =>", error);
+    // CLEAR FORM
+    setFormData({
+      fullName: "",
+      email: "",
+      photoUrl: "",
+      password: "",
+    });
 
-      toast.error(
-        error?.message ||
-          error?.error?.message ||
-          "Signup failed!"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    router.push("/");
+    router.refresh();
+
+  } catch (error) {
+    console.error("Signup Error =>", error);
+
+    toast.error(
+      error?.message ||
+        error?.error?.message ||
+        "Signup failed!"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#F4F7FB] flex items-center justify-center p-4">
